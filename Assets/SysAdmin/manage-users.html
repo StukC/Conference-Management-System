@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage User Accounts</title>
+    <!-- Add your stylesheet links here -->
+    <link rel="stylesheet" href="manage-users.css">
+</head>
+<body>
+    <header>
+        <h1>Manage User Accounts</h1>
+        <a href="admin-dashboard.html">Back to Dashboard</a>
+    </header>
+
+    <!-- User Accounts Table -->
+    <section>
+        <h2>User Accounts</h2>
+        <button id="addUserBtn">Add New User</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Example User Data -->
+                <tr>
+                    <td>john_doe</td>
+                    <td>johndoe@example.com</td>
+                    <td>Author</td>
+                    <td>
+                        <button>Edit</button>
+                        <button>Delete</button>
+                    </td>
+                </tr>
+                <!-- More user data here -->
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Add/Edit User Form (Can be a Modal or Inline Form) -->
+    <section id="userForm" style="display:none;">
+        <h2>Add/Edit User</h2>
+        <form>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"><br><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email"><br><br>
+            <label for="role">Role:</label>
+            <select id="role" name="role">
+                <option value="author">Author</option>
+                <option value="reviewer">Reviewer</option>
+                <option value="admin">Admin</option>
+            </select><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2023 Conference Management System</p>
+    </footer>
+    <!-- Link to your JavaScript file -->
+    <script src="manage-users.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Program Chair Accounts</title>
+    <link rel="stylesheet" href="manage-users.css"> <!-- Using the same stylesheet -->
+</head>
+<body>
+    <header>
+        <h1>Manage Program Chair Accounts</h1>
+        <a href="admin-dashboard.html">Back to Dashboard</a>
+    </header>
+
+    <!-- Program Chair Accounts Table -->
+    <section>
+        <h2>Program Chair Accounts</h2>
+        <button id="addChairBtn">Add New Chair</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Title</th>
+                    <th>Affiliation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Example Program Chair Data -->
+                <tr>
+                    <td>chair_smith</td>
+                    <td>chairsmith@example.com</td>
+                    <td>Dr.</td>
+                    <td>University of Michigan</td>
+                    <td>
+                        <button class="edit">Edit</button>
+                        <button class="delete">Delete</button>
+                    </td>
+                </tr>
+                <!-- More program chair data here -->
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Add/Edit Program Chair Form (Can be a Modal or Inline Form) -->
+    <section id="chairForm" style="display:none;">
+        <h2>Add/Edit Program Chair</h2>
+        <form>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"><br><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email"><br><br>
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title"><br><br>
+            <label for="affiliation">Affiliation:</label>
+            <input type="text" id="affiliation" name="affiliation"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2023 Conference Management System</p>
+    </footer>
+    <!-- Link to your JavaScript file (you might need a new one or expand the existing one) -->
+    <script src="manage-program-chair.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Conference Entry</title>
+    <link rel="stylesheet" href="create-conference.css">
+</head>
+<body>
+    <header>
+        <h1>Create Conference Entry</h1>
+        <a href="admin-dashboard.html">Back to Dashboard</a>
+    </header>
+
+    <!-- Conference Entry Form -->
+    <section>
+        <form id="conferenceForm">
+            <label for="conferenceName">Conference Name:</label>
+            <input type="text" id="conferenceName" name="conferenceName" required><br><br>
+
+            <label for="conferenceLocation">Location (City, State, Country):</label>
+            <input type="text" id="conferenceLocation" name="conferenceLocation" required><br><br>
+
+            <label for="conferenceStartDate">Conference Start Date:</label>
+            <input type="date" id="conferenceStartDate" name="conferenceStartDate" required><br><br>
+
+            <label for="conferenceEndDate">Conference End Date:</label>
+            <input type="date" id="conferenceEndDate" name="conferenceEndDate" required><br><br>
+
+            <label for="paperSubmissionDeadline">Paper Submission Deadline:</label>
+            <input type="date" id="paperSubmissionDeadline" name="paperSubmissionDeadline" required><br><br>
+
+            <fieldset>
+                <legend>Conference Program Chair Information:</legend>
+                
+                <label for="chairEmail">Email:</label>
+                <input type="email" id="chairEmail" name="chairEmail" required><br><br>
+
+                <label for="chairFirstName">First Name:</label>
+                <input type="text" id="chairFirstName" name="chairFirstName" required><br><br>
+
+                <label for="chairLastName">Last Name:</label>
+                <input type="text" id="chairLastName" name="chairLastName" required><br><br>
+
+                <label for="chairTitle">Title:</label>
+                <input type="text" id="chairTitle" name="chairTitle" required><br><br>
+
+                <label for="chairAffiliation">Affiliation:</label>
+                <input type="text" id="chairAffiliation" name="chairAffiliation" required><br><br>
+            </fieldset>
+
+            <input type="submit" value="Create Conference">
+        </form>
+    </section>
+    <!-- Link to your JavaScript file (if needed) -->
+    <script src="create-conference.js"></script>
+</body>
+</html>
