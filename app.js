@@ -11,7 +11,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
   user: 'stukc', // Replace with your MySQL username
-  password: 'password', // Replace with your MySQL password
+  password: '141013372423:^)', // Replace with your MySQL password
   database: 'project' // Replace with your schema name
 });
 
@@ -87,6 +87,69 @@ app.post('/login', (req, res) => {
       console.error('Error comparing passwords:', bcryptError);
       res.status(500).send('Server error during password comparison');
     }
+  });
+});
+
+//fetch users
+app.get('/api/users', (req, res) => {
+  pool.query('SELECT Username, Email, Title as Role FROM users', (error, results) => {
+      if (error) {
+          console.error('Error fetching users:', error);
+          return res.status(500).send('Server error');
+      }
+      res.json(results);
+  });
+});
+
+
+// Add User
+app.post('/api/users', async (req, res) => {
+  const { username, email, firstName, lastName, role, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 8); // Hash the password
+
+  pool.query('INSERT INTO users (FirstName, LastName, Username, Email, Title, Password) VALUES (?, ?, ?, ?, ?, ?)',
+             [firstName, lastName, username, email, role, hashedPassword], 
+             (error, results) => {
+      if (error) {
+          console.error('Error adding user:', error);
+          return res.status(500).send('Server error');
+      }
+      res.status(201).send('User added successfully');
+  });
+});
+
+// Edit User
+app.put('/api/users/:username', (req, res) => {
+  const { email, role } = req.body;
+  const username = req.params.username;
+
+  pool.query('UPDATE users SET Email = ?, Title = ? WHERE Username = ?',
+             [email, role, username],
+             (error, results) => {
+      if (error) {
+          console.error('Error updating user:', error);
+          return res.status(500).send('Server error');
+      }
+      if (results.affectedRows === 0) {
+          return res.status(404).send('User not found');
+      }
+      res.send('User updated successfully');
+  });
+});
+
+// Delete User
+app.delete('/api/users/:username', (req, res) => {
+  const username = req.params.username;
+
+  pool.query('DELETE FROM users WHERE Username = ?', [username], (error, results) => {
+      if (error) {
+          console.error('Error deleting user:', error);
+          return res.status(500).send('Server error');
+      }
+      if (results.affectedRows === 0) {
+          return res.status(404).send('User not found');
+      }
+      res.send('User deleted successfully');
   });
 });
 

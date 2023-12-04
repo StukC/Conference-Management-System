@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User Account</title>
+    <link rel="stylesheet" href="create-user.css"> <!-- Ensure you have this CSS file -->
+</head>
+<body>
+    <header>
+        <h1>Create User Account</h1>
+        <a href="admin-dashboard.html">Back to Dashboard</a>
+    </header>
+
+    <!-- User Account Creation Form -->
+    <section>
+        <form id="userCreationForm" action="/api/users" method="post">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required><br><br>
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required><br><br>
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <label for="role">Role:</label>
+            <select id="role" name="role">
+                <option value="author">Author</option>
+                <option value="reviewer">Reviewer</option>
+                <option value="admin">Admin</option>
+                <!-- Add other roles as needed -->
+            </select><br><br>
+
+            <input type="submit" value="Create User">
+        </form>
+    </section>
+
+    <!-- Link to your JavaScript file (if needed) -->
+    <script src="create-user.js"></script> <!-- Ensure you have this JS file -->
+</body>
+</html>

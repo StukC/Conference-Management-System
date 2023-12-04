@@ -6,7 +6,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
   user: 'stukc', // your MySQL username
-  password: 'password', // your MySQL password
+  password: '141013372423:^)', // your MySQL password
   database: 'project' // your schema name
 });
 

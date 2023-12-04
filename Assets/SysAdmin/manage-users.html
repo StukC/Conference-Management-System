@@ -16,7 +16,7 @@
     <!-- User Accounts Table -->
     <section>
         <h2>User Accounts</h2>
-        <button id="addUserBtn">Add New User</button>
+        <button id="addUserBtn" onclick="window.location.href='create-user.html'">Add New User</button>
         <table>
             <thead>
                 <tr>
@@ -27,35 +27,27 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Example User Data -->
-                <tr>
-                    <td>john_doe</td>
-                    <td>johndoe@example.com</td>
-                    <td>Author</td>
-                    <td>
-                        <button>Edit</button>
-                        <button>Delete</button>
-                    </td>
-                </tr>
-                <!-- More user data here -->
+                <!-- User data will be loaded here -->
             </tbody>
         </table>
     </section>
 
     <!-- Add/Edit User Form (Can be a Modal or Inline Form) -->
     <section id="userForm" style="display:none;">
-        <h2>Add/Edit User</h2>
-        <form>
+        <h2 id="formTitle">Add/Edit User</h2>
+        <form id="userFormElement">
+            <input type="hidden" id="formType" value="add">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username"><br><br>
+            <input type="text" id="username" name="username" required><br><br>
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email"><br><br>
+            <input type="email" id="email" name="email" required><br><br>
             <label for="role">Role:</label>
             <select id="role" name="role">
                 <option value="author">Author</option>
                 <option value="reviewer">Reviewer</option>
                 <option value="admin">Admin</option>
             </select><br><br>
+            <!-- Include password field if necessary for adding users -->
             <input type="submit" value="Submit">
         </form>
     </section>
