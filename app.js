@@ -48,16 +48,31 @@ app.post('/login', (req, res) => {
       if (!isMatch) {
         return res.status(401).send('Password is incorrect');
       }
-      // User authenticated, proceed with session creation or token generation
-      res.send('User logged in successfully!');
+
+      // User authenticated, check user's title
+      const userTitle = results[0].Title;
+      switch (userTitle) {
+        case 'Admin':
+          res.redirect('/SysAdmin/admin-dashboard.html');
+          break;
+        case 'Reviewer':
+          res.redirect('/Reviewer/reviewer-dashboard.html'); 
+          break;
+        case 'Author':
+          res.redirect('/Author/author-dashboard.html'); 
+          break;
+        case 'Chair':
+          res.redirect('/Chair/program-chair-dashboard.html'); 
+          break;
+        default:
+          res.send('NA.');
+      }      
     } catch (bcryptError) {
       console.error('Error comparing passwords:', bcryptError);
       res.status(500).send('Server error during password comparison');
     }
   });
 });
-
-// Additional routes can be added here
 
 // Start the server
 app.listen(port, () => {
