@@ -74,7 +74,7 @@ app.post('/login', (req, res) => {
         case 'Reviewer':
           res.redirect('/Reviewer/reviewer-dashboard.html');
           break;
-        case 'Author':
+        case 'author':
           res.redirect('/Author/author-dashboard.html');
           break;
         case 'Chair':
@@ -183,6 +183,17 @@ app.delete('/api/users/:username', (req, res) => {
           return res.status(404).send('User not found');
       }
       res.send('User deleted successfully');
+  });
+});
+
+// Fetch all conferences
+app.get('/api/conferences', (req, res) => {
+  pool.query('SELECT ConferenceID, ConferenceName FROM Conferences', (error, results) => {
+      if (error) {
+          console.error('Error fetching conferences:', error);
+          return res.status(500).send('Server error');
+      }
+      res.json(results);
   });
 });
 

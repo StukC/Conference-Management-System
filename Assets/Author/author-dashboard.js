@@ -1,25 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // This code runs when the document is fully loaded
-
-    // Example: Handling navigation menu clicks
-    var navItems = document.querySelectorAll('nav ul li a');
-    navItems.forEach(function(item) {
-        item.addEventListener('click', function(event) {
-            // Placeholder for navigation click handling
-            console.log('Navigating to: ' + event.target.textContent);
-        });
-    });
-
-    // Add more event listeners and functions as needed
+    loadConferences();
 });
 
-// Example function to handle form submission
-function handleFormSubmission(event) {
-    event.preventDefault();  // Prevent default form submission behavior
-    // Logic to handle form data
-    console.log("Form submitted");
-    // You can use AJAX here to send data to the server
+function loadConferences() {
+    fetch('/api/conferences')
+        .then(response => response.json())
+        .then(conferences => {
+            const dropdown = document.getElementById('conferenceDropdown');
+            conferences.forEach(conference => {
+                const option = document.createElement('option');
+                option.value = conference.ConferenceID;
+                option.textContent = conference.ConferenceName;
+                dropdown.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading conferences:', error);
+        });
 }
-
-// You can add more functions for different tasks like handling AJAX requests, updating UI, etc.
-
