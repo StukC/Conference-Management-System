@@ -118,6 +118,22 @@ app.post('/api/users', async (req, res) => {
   });
 });
 
+// Fetch specific user details
+app.get('/api/users/:username', (req, res) => {
+  const username = req.params.username;
+  pool.query('SELECT Username, Email, Title FROM users WHERE Username = ?', [username], (error, results) => {
+      if (error) {
+          console.error('Error fetching user:', error);
+          return res.status(500).send('Server error');
+      }
+      if (results.length === 0) {
+          return res.status(404).send('User not found');
+      }
+      res.json(results[0]);
+  });
+});
+
+
 // Edit User
 app.put('/api/users/:username', (req, res) => {
   const { email, role } = req.body;
@@ -126,6 +142,23 @@ app.put('/api/users/:username', (req, res) => {
   pool.query('UPDATE users SET Email = ?, Title = ? WHERE Username = ?',
              [email, role, username],
              (error, results) => {
+      if (error) {
+          console.error('Error updating user:', error);
+          return res.status(500).send('Server error');
+      }
+      if (results.affectedRows === 0) {
+          return res.status(404).send('User not found');
+      }
+      res.send('User updated successfully');
+  });
+});
+
+// Update user
+app.put('/api/users/:username', async (req, res) => {
+  const username = req.params.username;
+  const { email, title } = req.body;
+  // Add necessary fields and validation as required
+  pool.query('UPDATE users SET Email = ?, Title = ? WHERE Username = ?', [email, title, username], (error, results) => {
       if (error) {
           console.error('Error updating user:', error);
           return res.status(500).send('Server error');
@@ -152,6 +185,71 @@ app.delete('/api/users/:username', (req, res) => {
       res.send('User deleted successfully');
   });
 });
+
+//conferences endpoint
+app.post('/api/conferences', async (req, res) => {
+  const { conferenceName, city, state, country, startDate, endDate, submissionDeadline, chairEmail, chairFirst, chairLast, chairTitle, chairAffiliation } = req.body;
+
+  // Validate data here
+
+  const username = chairEmail; // Using email as username
+  const password = 'generatedPassword'; // Generate or obtain a password
+  const hashedPassword = await bcrypt.hash(password, 8); // Hash the password
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error getting connection:', err);
+      return res.status(500).send('Server error');
+    }
+
+    connection.beginTransaction(err => {
+      if (err) {
+        connection.release();
+        console.error('Error starting transaction:', err);
+        return res.status(500).send('Server error');
+      }
+
+      // Insert into conferences table
+      const conferenceQuery = 'INSERT INTO conferences (ConferenceName, City, State, Country, StartDate, EndDate, SubmissionDeadline, ChairEmail, ChairFirst, ChairLast, ChairTitle, ChairAffiliation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+      connection.query(conferenceQuery, [conferenceName, city, state, country, startDate, endDate, submissionDeadline, chairEmail, chairFirst, chairLast, chairTitle, chairAffiliation], (error, results) => {
+        if (error) {
+          return connection.rollback(() => {
+            connection.release();
+            console.error('Error inserting conference:', error);
+            return res.status(500).send('Server error');
+          });
+        }
+
+        // Insert into users table
+        const userQuery = 'INSERT INTO users (Email, FirstName, LastName, Title, Username, Password) VALUES (?, ?, ?, ?, ?, ?)';
+        connection.query(userQuery, [chairEmail, chairFirst, chairLast, chairTitle, username, hashedPassword], (error, results) => {
+          if (error) {
+            return connection.rollback(() => {
+              connection.release();
+              console.error('Error inserting user:', error);
+              return res.status(500).send('Server error');
+            });
+          }
+
+          // Commit transaction
+          connection.commit(err => {
+            if (err) {
+              return connection.rollback(() => {
+                connection.release();
+                console.error('Error committing transaction:', err);
+                return res.status(500).send('Server error');
+              });
+            }
+
+            connection.release();
+            res.send('Conference and user added successfully');
+          });
+        });
+      });
+    });
+  });
+});
+
 
 // Logout endpoint
 app.get('/logout', (req, res) => {

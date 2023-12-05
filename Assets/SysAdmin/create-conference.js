@@ -7,21 +7,42 @@ document.addEventListener('DOMContentLoaded', function() {
         // Collecting form data
         var formData = {
             conferenceName: document.getElementById('conferenceName').value,
-            conferenceLocation: document.getElementById('conferenceLocation').value,
-            conferenceStartDate: document.getElementById('conferenceStartDate').value,
-            conferenceEndDate: document.getElementById('conferenceEndDate').value,
-            paperSubmissionDeadline: document.getElementById('paperSubmissionDeadline').value,
+            city: document.getElementById('conferenceCity').value,
+            state: document.getElementById('conferenceState').value,
+            country: document.getElementById('conferenceCountry').value,
+            startDate: document.getElementById('conferenceStartDate').value,
+            endDate: document.getElementById('conferenceEndDate').value,
+            submissionDeadline: document.getElementById('paperSubmissionDeadline').value,
             chairEmail: document.getElementById('chairEmail').value,
-            chairFirstName: document.getElementById('chairFirstName').value,
-            chairLastName: document.getElementById('chairLastName').value,
+            chairFirst: document.getElementById('chairFirstName').value,
+            chairLast: document.getElementById('chairLastName').value,
             chairTitle: document.getElementById('chairTitle').value,
             chairAffiliation: document.getElementById('chairAffiliation').value
         };
 
-        console.log(formData); // For demonstration, we'll just log the data to the console
-
-        // Here you would typically send the formData to the server
-
-        alert('Conference entry created successfully!'); // Placeholder feedback
-    });
+        // AJAX request to send data to server
+        fetch('/api/conferences', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if(response.ok) {
+                return response.text();
+            } else {
+                throw new Error('Server responded with an error!');
+            }
+        })
+        .then(data => {
+            console.log('Success:', data);
+            alert('Conference entry created successfully!');
+            window.location.href = '/SysAdmin/admin-dashboard.html'; // Redirect to admin dashboard
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Error creating conference');
+        });
+});
 });

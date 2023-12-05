@@ -118,7 +118,6 @@ function deleteUser(username) {
     }
 }
 
-// You would need to bind this function to your form's onsubmit event
 document.getElementById('userFormElement').onsubmit = function(event) {
     event.preventDefault();
     submitUserForm();

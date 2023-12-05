@@ -18,8 +18,17 @@
             <label for="conferenceName">Conference Name:</label>
             <input type="text" id="conferenceName" name="conferenceName" required><br><br>
 
-            <label for="conferenceLocation">Location (City, State, Country):</label>
-            <input type="text" id="conferenceLocation" name="conferenceLocation" required><br><br>
+                        <!-- Split Location into City, State, Country -->
+                        <div class="location-group">
+                            <label for="conferenceCity">City:</label>
+                            <input type="text" id="conferenceCity" name="conferenceCity" required><br><br>
+            
+                            <label for="conferenceState">State/Province:</label>
+                            <input type="text" id="conferenceState" name="conferenceState"><br><br>
+            
+                            <label for="conferenceCountry">Country:</label>
+                            <input type="text" id="conferenceCountry" name="conferenceCountry" required><br><br>
+                        </div>
 
             <label for="conferenceStartDate">Conference Start Date:</label>
             <input type="date" id="conferenceStartDate" name="conferenceStartDate" required><br><br>
