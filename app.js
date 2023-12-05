@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const mysql = require('mysql2');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 const session = require('express-session');
 const app = express();
 const port = 3000;
@@ -101,6 +103,21 @@ app.get('/api/users', (req, res) => {
   });
 });
 
+app.post('/submit-paper', upload.single('paper'), (req, res) => {
+  const paperTitle = req.body.paperTitle; // Ensure this matches the name attribute in your HTML form
+  const paperAuthors = req.body.paperAuthors; // Ensure this matches the name attribute in your HTML form
+  const paperPath = req.file.path; // Path where the uploaded file is saved
+
+  // SQL to insert paper data into the Papers table
+  const insertQuery = 'INSERT INTO papers (PaperTitle, PaperAuthors, PaperPath) VALUES (?, ?, ?)';
+  pool.query(insertQuery, [paperTitle, paperAuthors, paperPath], (error, results) => {
+      if (error) {
+          console.error('Error submitting paper:', error);
+          return res.status(500).send('Error submitting paper');
+      }
+      res.send('Paper submitted successfully');
+  });
+});
 
 // Add User
 app.post('/api/users', async (req, res) => {
