@@ -3,10 +3,22 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const mysql = require('mysql2');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
 const session = require('express-session');
 const app = express();
 const port = 3000;
+
+// Updated multer configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname)); // Preserve file extension
+  }
+});
+
+const upload = multer({ storage: storage });
 
 // MySQL Connection Pool Setup
 const pool = mysql.createPool({
@@ -32,6 +44,12 @@ app.use(session({
 
 // Serve static files from the 'Assets' directory
 app.use(express.static('Assets'));
+
+// Use the path module for cross-platform compatibility
+const path = require('path');
+
+// Serve static files from 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Root route serving login.html
 app.get('/', (req, res) => {
@@ -103,14 +121,56 @@ app.get('/api/users', (req, res) => {
   });
 });
 
-app.post('/submit-paper', upload.single('paper'), (req, res) => {
-  const paperTitle = req.body.paperTitle; // Ensure this matches the name attribute in your HTML form
-  const paperAuthors = req.body.paperAuthors; // Ensure this matches the name attribute in your HTML form
-  const paperPath = req.file.path; // Path where the uploaded file is saved
+// Fetch user's paper submissions
+app.get('/api/my-submissions', (req, res) => {
+  if (!req.session.user) {
+    return res.status(403).send('Not logged in');
+  }
 
-  // SQL to insert paper data into the Papers table
-  const insertQuery = 'INSERT INTO papers (PaperTitle, PaperAuthors, PaperPath) VALUES (?, ?, ?)';
-  pool.query(insertQuery, [paperTitle, paperAuthors, paperPath], (error, results) => {
+  const userId = req.session.user.id;
+
+  pool.query('SELECT PaperID, PaperTitle, PaperAuthors, PaperPath, OriginalFilename FROM papers WHERE UserID = ?', [userId], (error, results) => {
+    if (error) {
+      console.error('Error fetching user submissions:', error);
+      return res.status(500).send('Server error');
+    }
+    res.json(results);
+  });
+});
+
+app.get('/uploads/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, 'uploads', filename);
+
+  // Set headers for PDF content type
+  res.setHeader('Content-Type', 'application/pdf');
+
+  // Suggest a default filename when saving (e.g., "downloaded.pdf")
+  // We append .pdf to ensure the file is saved with the correct extension
+  res.setHeader('Content-Disposition', `inline; filename="${filename}.pdf"`);
+
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error('Error sending file:', err);
+      res.status(500).send('Server error');
+    }
+  });
+});
+
+//submit-paper endpoint
+app.post('/submit-paper', upload.single('paper'), (req, res) => {
+  if (!req.session.user) {
+    return res.status(403).send('Not logged in');
+  }
+
+  const userId = req.session.user.id;
+  const paperTitle = req.body.paperTitle;
+  const paperAuthors = req.body.paperAuthors;
+  const paperPath = req.file.path;
+  const originalFilename = req.file.originalname; // Get the original file name
+
+  const insertQuery = 'INSERT INTO papers (PaperTitle, PaperAuthors, PaperPath, OriginalFilename, UserID) VALUES (?, ?, ?, ?, ?)';
+  pool.query(insertQuery, [paperTitle, paperAuthors, paperPath, originalFilename, userId], (error, results) => {
       if (error) {
           console.error('Error submitting paper:', error);
           return res.status(500).send('Error submitting paper');
