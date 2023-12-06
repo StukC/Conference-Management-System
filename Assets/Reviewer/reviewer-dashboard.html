@@ -9,7 +9,7 @@
 <body>
     <header>
         <h1>Conference Review System</h1>
-        <a href="logout.html">Logout</a>
+        <a href="/logout">Logout</a>
     </header>
     <nav>
         <!-- Navigation Links, if needed -->
@@ -32,7 +32,28 @@
     </main>
     <footer>
         <p>&copy; 2023 Conference Management System</p>
-    </footer>
-    <script src="reviewer-dashboard.js"></script>
-</body>
-</html>
+
+        <footer>
+            <p>&copy; 2023 Conference Management System</p>
+        </footer>
+        
+        <!-- Review Modal -->
+        <div id="reviewModal" style="display:none;">
+            <h2>Submit Review</h2>
+            <form id="reviewForm">
+                <input type="hidden" id="assignmentId" name="assignmentId">
+                <label for="recommendation">Recommendation:</label>
+                <select id="recommendation" name="recommendation">
+                    <option value="Accept">Accept</option>
+                    <option value="Neutral">Neutral</option>
+                    <option value="Reject">Reject</option>
+                </select>
+                <label for="comments">Comments:</label>
+                <textarea id="comments" name="comments"></textarea>
+                <button type="submit">Submit Review</button>
+            </form>
+        </div>
+        
+        <script src="reviewer-dashboard.js"></script>
+        </body>
+        </html>

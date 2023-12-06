@@ -85,19 +85,21 @@ app.post('/login', (req, res) => {
         title: results[0].Title
       };
 
+      // Convert userTitle to lowercase (or uppercase) for consistent comparison
+      const userTitle = results[0].Title.toLowerCase(); // or .toUpperCase()
+
       // Redirect based on user's title
-      const userTitle = results[0].Title;
       switch (userTitle) {
-        case 'Admin':
+        case 'admin':
           res.redirect('/SysAdmin/admin-dashboard.html');
           break;
-        case 'Reviewer':
+        case 'reviewer':
           res.redirect('/Reviewer/reviewer-dashboard.html');
           break;
         case 'author':
           res.redirect('/Author/author-dashboard.html');
           break;
-        case 'Chair':
+        case 'chair':
           res.redirect('/Chair/program-chair-dashboard.html');
           break;
         default:
@@ -209,7 +211,6 @@ app.get('/api/users/:username', (req, res) => {
       res.json(results[0]);
   });
 });
-
 
 // Edit User
 app.put('/api/users/:username', (req, res) => {
@@ -337,6 +338,82 @@ app.post('/api/conferences', async (req, res) => {
     });
   });
 });
+
+app.get('/api/chair-review-progress', async (req, res) => {
+  if (!req.session.user || req.session.user.title !== 'Chair') {
+    return res.status(403).send('Access denied');
+  }
+
+  try {
+    const papersQuery = `
+      SELECT p.PaperID, p.PaperTitle, 
+             r1.Name as Reviewer1, r1.Recommendation as Rec1,
+             r2.Name as Reviewer2, r2.Recommendation as Rec2,
+             r3.Name as Reviewer3, r3.Recommendation as Rec3
+      FROM papers p
+      LEFT JOIN reviews r1 ON p.Review1ID = r1.ReviewID
+      LEFT JOIN reviews r2 ON p.Review2ID = r2.ReviewID
+      LEFT JOIN reviews r3 ON p.Review3ID = r3.ReviewID
+      WHERE p.ConferenceID = ?`;
+
+    const papers = await pool.promise().query(papersQuery, [req.session.user.conferenceId]);
+    const papersWithRecommendation = papers[0].map(paper => {
+      // Logic to calculate automatic recommendation
+      const recs = [paper.Rec1, paper.Rec2, paper.Rec3];
+      const publishCount = recs.filter(r => r === 'Accept').length;
+      const rejectCount = recs.filter(r => r === 'Reject' || r === 'Neutral').length;
+      
+      paper.FinalRecommendation = 'Pending';
+      if (publishCount === 3) {
+        paper.FinalRecommendation = 'Publish';
+      } else if (rejectCount >= 2) {
+        paper.FinalRecommendation = 'Do Not Publish';
+      }
+
+      return paper;
+    });
+
+    res.json(papersWithRecommendation);
+  } catch (error) {
+    console.error('Error fetching review progress:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+// Fetch papers assigned to the logged-in reviewer
+app.get('/api/reviewer/assigned-papers', (req, res) => {
+  if (!req.session.user || req.session.user.title !== 'Reviewer') {
+      return res.status(403).send('Access denied');
+  }
+
+  const reviewerId = req.session.user.id;
+  pool.query('SELECT p.PaperTitle, c.ConferenceName, a.AssignmentID FROM assignments a INNER JOIN papers p ON a.PaperID = p.PaperID INNER JOIN conferences c ON p.ConferenceID = c.ConferenceID WHERE a.ReviewerID = ?', [reviewerId], (error, results) => {
+      if (error) {
+          console.error('Error fetching assigned papers:', error);
+          return res.status(500).send('Server error');
+      }
+      res.json(results);
+  });
+});
+
+
+// Endpoint for reviewers to submit reviews
+app.post('/api/reviewer/submit-review', (req, res) => {
+  if (!req.session.user || req.session.user.title !== 'Reviewer') {
+      return res.status(403).send('Access denied');
+  }
+
+  const { assignmentId, recommendation, comments } = req.body;
+  const reviewQuery = 'INSERT INTO reviews (AssignmentID, Recommendation, Comments) VALUES (?, ?, ?)';
+  pool.query(reviewQuery, [assignmentId, recommendation, comments], (error, results) => {
+      if (error) {
+          console.error('Error submitting review:', error);
+          return res.status(500).send('Server error');
+      }
+      res.send('Review submitted successfully');
+  });
+});
+
 
 
 // Logout endpoint
