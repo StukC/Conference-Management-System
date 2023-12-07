@@ -1,44 +1,61 @@
-function loadAssignedPapers() {
-    fetch('/api/reviewer/assigned-papers')
+document.addEventListener('DOMContentLoaded', function() {
+    loadPapersForReview();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const viewButtons = document.querySelectorAll('.view-button');
+    viewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            window.open('test.pdf', '_blank');
+        });
+    });
+});
+
+function loadPapersForReview() {
+    fetch('/api/reviewer/papers')
         .then(response => response.json())
         .then(papers => {
-            const reviewTableBody = document.getElementById('review-table').querySelector('tbody');
+            const tableBody = document.getElementById('review-table').querySelector('tbody');
+            tableBody.innerHTML = ''; // Clear existing table rows.
             papers.forEach(paper => {
-                const row = document.createElement('tr');
+                const row = tableBody.insertRow();
                 row.innerHTML = `
                     <td>${paper.PaperTitle}</td>
                     <td>${paper.ConferenceName}</td>
-                    <td><button onclick="openReviewModal(${paper.AssignmentID})">Review</button></td>
+                    <td>${paper.Status || 'Pending'}</td>
+                    <td><button onclick="openReviewModal(${paper.PaperID})">Review</button></td>
                 `;
-                reviewTableBody.appendChild(row);
             });
         })
         .catch(error => {
-            console.error('Error loading assigned papers:', error);
+            console.error('Error loading papers for review:', error);
         });
 }
 
-function openReviewModal(assignmentId) {
-    // Set the assignmentId in the hidden field
-    document.getElementById('assignmentId').value = assignmentId;
 
-    // Show the modal
-    document.getElementById('reviewModal').style.display = 'block';
+function openReviewModal(paperId) {
+    // Populate and show the modal for the specific paper
+    const modal = document.getElementById('reviewModal');
+    document.getElementById('assignmentId').value = paperId;
+    modal.style.display = 'block';
 }
 
 document.getElementById('reviewForm').addEventListener('submit', function(event) {
     event.preventDefault();
-
     const formData = new FormData(this);
-    fetch('/api/reviewer/submit-review', {
+    const paperId = formData.get('assignmentId');
+
+    // Send the review to the server
+    fetch(`/api/reviewer/submit-review/${paperId}`, {
         method: 'POST',
         body: formData
     })
     .then(response => response.text())
     .then(data => {
-        console.log(data);
         alert('Review submitted successfully!');
         document.getElementById('reviewModal').style.display = 'none';
+        // Refresh the list of papers
+        loadPapersForReview();
     })
     .catch(error => {
         console.error('Error:', error);

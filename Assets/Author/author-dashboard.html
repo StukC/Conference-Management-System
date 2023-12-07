@@ -22,19 +22,17 @@
         <section id="submit-paper">
             <h3>Submit a Paper</h3>
             <form id="paper-submission-form">
-        <!-- Conference Selection Dropdown -->
         <section>
             <h2>Select Conference</h2>
             <select id="conferenceDropdown">
                 <option value="">Select a Conference</option>
-                <!-- Conference options will be loaded here -->
             </select>
         </section>
                 </select>
                 <label for="paper-title">Paper Title:</label>
                 <input type="text" id="paper-title" name="paperTitle">
                 <label for="co-authors">Co-authors (usernames):</label>
-                <input type="text" id="co-authors" name="paperAuthors">
+                <input type="text" id="co-authors" name="">
                 <label for="paper-upload">Upload Paper:</label>
                 <input type="file" id="paper-upload" name="paper">
                 <button type="submit">Submit</button>
@@ -44,14 +42,8 @@
         <section id="my-submissions">
             <h3>My Submissions</h3>
             <div id="submissions-list">
-                <!-- Submissions will be listed here. Backend will populate this area -->
             </div>
-        </section>
-
-        <section id="profile">
-            <h3>My Profile</h3>
-            <!-- Profile information will be displayed here -->
-        </section>
+        </section>        
     </main>
     <footer>
         <p>&copy; 2023 Conference Management System</p>

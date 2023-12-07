@@ -12,10 +12,9 @@
         <a href="/logout">Logout</a>
     </header>
     <nav>
-        <!-- Navigation Links, if needed -->
     </nav>
     <main>
-        <h2>Welcome, [Reviewer's Name]</h2>
+        <h2>Welcome!</h2>
         <table id="review-table">
             <thead>
                 <tr>
@@ -29,14 +28,6 @@
                 <!-- Rows of papers to review will be populated here -->
             </tbody>
         </table>
-    </main>
-    <footer>
-        <p>&copy; 2023 Conference Management System</p>
-
-        <footer>
-            <p>&copy; 2023 Conference Management System</p>
-        </footer>
-        
         <!-- Review Modal -->
         <div id="reviewModal" style="display:none;">
             <h2>Submit Review</h2>
@@ -51,8 +42,16 @@
                 <label for="comments">Comments:</label>
                 <textarea id="comments" name="comments"></textarea>
                 <button type="submit">Submit Review</button>
+                <button class="view-button">View</button>
             </form>
         </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Conference Management System</p>
+
+        <footer>
+            <p>&copy; 2023 Conference Management System</p>
+        </footer>
         
         <script src="reviewer-dashboard.js"></script>
         </body>

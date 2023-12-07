@@ -24,22 +24,21 @@ const upload = multer({ storage: storage });
 const pool = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
-  user: 'stukc', // Replace with your MySQL username
-  password: 'pass', // Replace with your MySQL password
-  database: 'project' // Replace with your schema name
+  user: 'stukc', // SQL Username
+  password: 'pass', // MySQL password
+  database: 'project' // Schema name
 });
 
-// Middleware for parsing application/x-www-form-urlencoded
+// Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-// Middleware for parsing application/json
 app.use(bodyParser.json());
 
 // Session Middleware
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'default_secret', // Use an environment variable
+  secret: process.env.SESSION_SECRET || 'default_secret',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // Set to true in a production environment with HTTPS
+  cookie: { secure: false }
 }));
 
 // Serve static files from the 'Assets' directory
@@ -147,8 +146,7 @@ app.get('/uploads/:filename', (req, res) => {
   // Set headers for PDF content type
   res.setHeader('Content-Type', 'application/pdf');
 
-  // Suggest a default filename when saving (e.g., "downloaded.pdf")
-  // We append .pdf to ensure the file is saved with the correct extension
+  // append .pdf to ensure correct extension
   res.setHeader('Content-Disposition', `inline; filename="${filename}.pdf"`);
 
   res.sendFile(filePath, (err) => {
@@ -339,82 +337,27 @@ app.post('/api/conferences', async (req, res) => {
   });
 });
 
-app.get('/api/chair-review-progress', async (req, res) => {
-  if (!req.session.user || req.session.user.title !== 'Chair') {
-    return res.status(403).send('Access denied');
-  }
-
-  try {
-    const papersQuery = `
-      SELECT p.PaperID, p.PaperTitle, 
-             r1.Name as Reviewer1, r1.Recommendation as Rec1,
-             r2.Name as Reviewer2, r2.Recommendation as Rec2,
-             r3.Name as Reviewer3, r3.Recommendation as Rec3
-      FROM papers p
-      LEFT JOIN reviews r1 ON p.Review1ID = r1.ReviewID
-      LEFT JOIN reviews r2 ON p.Review2ID = r2.ReviewID
-      LEFT JOIN reviews r3 ON p.Review3ID = r3.ReviewID
-      WHERE p.ConferenceID = ?`;
-
-    const papers = await pool.promise().query(papersQuery, [req.session.user.conferenceId]);
-    const papersWithRecommendation = papers[0].map(paper => {
-      // Logic to calculate automatic recommendation
-      const recs = [paper.Rec1, paper.Rec2, paper.Rec3];
-      const publishCount = recs.filter(r => r === 'Accept').length;
-      const rejectCount = recs.filter(r => r === 'Reject' || r === 'Neutral').length;
-      
-      paper.FinalRecommendation = 'Pending';
-      if (publishCount === 3) {
-        paper.FinalRecommendation = 'Publish';
-      } else if (rejectCount >= 2) {
-        paper.FinalRecommendation = 'Do Not Publish';
-      }
-
-      return paper;
-    });
-
-    res.json(papersWithRecommendation);
-  } catch (error) {
-    console.error('Error fetching review progress:', error);
-    res.status(500).send('Server error');
-  }
-});
-
-// Fetch papers assigned to the logged-in reviewer
-app.get('/api/reviewer/assigned-papers', (req, res) => {
-  if (!req.session.user || req.session.user.title !== 'Reviewer') {
-      return res.status(403).send('Access denied');
-  }
-
-  const reviewerId = req.session.user.id;
-  pool.query('SELECT p.PaperTitle, c.ConferenceName, a.AssignmentID FROM assignments a INNER JOIN papers p ON a.PaperID = p.PaperID INNER JOIN conferences c ON p.ConferenceID = c.ConferenceID WHERE a.ReviewerID = ?', [reviewerId], (error, results) => {
+// Endpoint to fetch all conference details
+app.get('/api/reviewer/conferences', (req, res) => {
+  pool.query('SELECT * FROM conferences', (error, results) => {
       if (error) {
-          console.error('Error fetching assigned papers:', error);
+          console.error('Error fetching conferences:', error);
           return res.status(500).send('Server error');
       }
       res.json(results);
   });
 });
 
-
-// Endpoint for reviewers to submit reviews
-app.post('/api/reviewer/submit-review', (req, res) => {
-  if (!req.session.user || req.session.user.title !== 'Reviewer') {
-      return res.status(403).send('Access denied');
-  }
-
-  const { assignmentId, recommendation, comments } = req.body;
-  const reviewQuery = 'INSERT INTO reviews (AssignmentID, Recommendation, Comments) VALUES (?, ?, ?)';
-  pool.query(reviewQuery, [assignmentId, recommendation, comments], (error, results) => {
+// Endpoint to fetch all papers including final recommendation
+app.get('/api/reviewer/papers', (req, res) => {
+  pool.query('SELECT * FROM papers', (error, results) => {
       if (error) {
-          console.error('Error submitting review:', error);
+          console.error('Error fetching papers:', error);
           return res.status(500).send('Server error');
       }
-      res.send('Review submitted successfully');
+      res.json(results);
   });
 });
-
-
 
 // Logout endpoint
 app.get('/logout', (req, res) => {
